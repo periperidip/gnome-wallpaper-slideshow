@@ -30,15 +30,18 @@ class GTK_Main:
 		self.conf_file_path = os.path.join(self.conf_dir_path, "gnome-wallpaper-slideshow.config")
 		self.xml_file_path = os.path.join(self.conf_dir_path, "gnome-wallpaper-slideshow.xml")
 
-		# Create GTK Window
+		# Create a GTK window
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-		self.window.set_title("Gnome Wallpaper Slideshow")
+		self.window.set_title("GNOME Wallpaper Slideshow")
 		self.window.set_resizable(False)
 		self.window.connect("destroy", gtk.main_quit)
 
-		# Create window objects
+		# Our intention is to create multiple horizontal boxes and
+		# stack them on top of each other in a vertixal box. This
+		# is done so that the alignment of each row is not absurd.
 		vbox = gtk.VBox()
 
+		# The first HBox()
 		label = gtk.Label("Folder:")
 		label.set_alignment(0.0, 0.5)
 		self.folder_entry = gtk.Entry()
@@ -50,6 +53,7 @@ class GTK_Main:
 		hbox.pack_start(button, False)
 		vbox.pack_start(hbox, False)
 
+		# The second HBox()
 		label = gtk.Label("Picture duration:")
 		label.set_alignment(0.0, 0.5)
 		adj = gtk.Adjustment(5.0, 1.0, 60.0, 1.0, 1.0, 0.0)
@@ -65,6 +69,7 @@ class GTK_Main:
 		hbox.pack_start(self.pdur_combo, False)
 		vbox.pack_start(hbox, False)
 
+		# The third HBox()
 		label = gtk.Label("Transition duration:")
 		label.set_alignment(0.0, 0.5)
 		adj = gtk.Adjustment(5.0, 0.0, 60.0, 1.0, 1.0, 0.0)
@@ -80,6 +85,7 @@ class GTK_Main:
 		hbox.pack_start(self.tdur_combo, False)
 		vbox.pack_start(hbox, False)
 
+		# The fourth HBox()
 		self.cancel_button = gtk.Button(stock=gtk.STOCK_CLOSE)
 		self.cancel_button.connect("clicked", gtk.main_quit)
 		self.ok_button = gtk.Button(stock=gtk.STOCK_OK)
@@ -201,7 +207,7 @@ class GTK_Main:
 		conf_file.write(settings)
 		conf_file.close()
 
-		# Create wallpaper xml
+		# Create wallpaper XML
 		doc = libxml2.parseDoc("""<background><starttime><year>2010</year><month>01</month><day>01</day><hour>00</hour><minute>00</minute><second>00</second></starttime></background>""")
 		root = doc.getRootElement()
 
@@ -223,7 +229,7 @@ class GTK_Main:
 				transition.addChild(transition.newChild(None, "to", self.files[0]))
 			root.addChild(transition)
 
-		# Write XML file
+		# Write to the XML file
 		try:
 			doc.saveFormatFileEnc(self.xml_file_path, "utf-8", 1)
 		except IOError as (errno, strerror):
@@ -235,12 +241,12 @@ class GTK_Main:
 			dialog.run()
 			return False
 
-		# Parse gnome backgrounds.xml file
+		# Parse the GNOME 'backgrounds.xml' file
 		backgrounds_file = os.path.expanduser("~/.gnome2/backgrounds.xml")
 		doc = libxml2.parseFile(backgrounds_file)
 		root = doc.getRootElement()
 
-		# Look for existing wallpaper entry
+		# Look for an existing wallpaper entry
 		ctxt = doc.xpathNewContext()
 		res = ctxt.xpathEval("/wallpapers/wallpaper[filename=\""+self.xml_file_path+"\"]")
 
@@ -267,13 +273,13 @@ class GTK_Main:
 					dialog.run()
 					return False
 
-		# Set xml file as current background
+		# Set the XML file as current background
 		conf_client = gconf.client_get_default()
 		conf_client.add_dir("/desktop/gnome/background", gconf.CLIENT_PRELOAD_NONE)
 		conf_client.set_string("/desktop/gnome/background/picture_filename", self.xml_file_path)
 		conf_client.set_string("/desktop/gnome/background/picture_options", "stretched")
 
-		# Exit gtk main loop
+		# Exit GTK main loop
 		gtk.main_quit()
 
 def main(argv):
@@ -324,7 +330,7 @@ def main(argv):
 		print "Folder '" + folder + "' contains no images."
 		sys.exit(1)
 
-	# Create wallpaper xml
+	# Create wallpaper XML
 	doc = libxml2.parseDoc("""<background><starttime><year>2010</year><month>01</month><day>01</day><hour>00</hour><minute>00</minute><second>00</second></starttime></background>""")
 	root = doc.getRootElement()
 
@@ -346,7 +352,7 @@ def main(argv):
 			transition.addChild(transition.newChild(None, "to", files[0]))
 		root.addChild(transition)
 
-	# Write XML file
+	# Write to the XML file
 	if not os.path.exists(os.path.expanduser("~/.gnome-wallpaper-slideshow")):
 		os.mkdir(os.path.expanduser("~/.gnome-wallpaper-slideshow"), 0755)
 	xml_file_path = os.path.expanduser("~/.gnome-wallpaper-slideshow/gnome-wallpaper-slideshow.xml")
@@ -356,12 +362,12 @@ def main(argv):
 		print "Failed to write file."
 		sys.exit(2)
 
-	# Parse gnome backgrounds.xml file
+	# Parse the GNOME 'backgrounds.xml' file
 	backgrounds_file = os.path.expanduser("~/.gnome2/backgrounds.xml")
 	doc = libxml2.parseFile(backgrounds_file)
 	root = doc.getRootElement()
 
-	# Look for existing wallpaper entry
+	# Look for an existing wallpaper entry
 	ctxt = doc.xpathNewContext()
 	res = ctxt.xpathEval("/wallpapers/wallpaper[filename=\""+xml_file_path+"\"]")
 
